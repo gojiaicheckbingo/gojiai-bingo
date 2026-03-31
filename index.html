@@ -3,758 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ご自愛♡ビンゴチェックシート</title>
+    <title>ご自愛♡ビンゴ</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        body { font-family: sans-serif; background: #F5E6D3; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .container { max-width: 450px; width: 100%; background: #FFF; border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .header { text-align: center; margin-bottom: 20px; }
+        .title { color: #B8434E; font-size: 24px; font-weight: bold; }
+        .subtitle { color: #8C6D67; font-size: 14px; }
+        .stats { display: flex; justify-content: space-around; background: #FDF8F5; padding: 10px; border-radius: 10px; margin-bottom: 20px; }
+        .stat-val { font-size: 20px; font-weight: bold; color: #B8434E; display: block; }
+        .bingo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+        .cell { 
+            height: 100px; background: #FFF; border: 2px solid #F2D5D8; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center; text-align: center;
+            font-size: 11px; cursor: pointer; position: relative; padding: 5px; overflow: hidden;
         }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'メイリオ', Meiryo, sans-serif;
-            background: linear-gradient(135deg, #F5E6D3 0%, #EDD9C8 100%);
-            min-height: 100vh;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            position: relative;
-            overflow-x: hidden;
-        }
-
-        /* 背景の装飾ハート */
-        .bg-hearts {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-            opacity: 0.1;
-        }
-
-        .bg-heart {
-            position: absolute;
-            color: #B8434E;
-            font-size: 40px;
-            animation: float 6s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(5deg); }
-        }
-
-        .container {
-            max-width: 500px;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 25px;
-            padding: 30px 20px;
-            box-shadow: 0 10px 40px rgba(184, 67, 78, 0.15);
-            position: relative;
-            z-index: 1;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 25px;
-        }
-
-        .title {
-            font-size: 24px;
-            color: #B8434E;
-            font-weight: bold;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .subtitle {
-            font-size: 14px;
-            color: #6B4C41;
-            background: #E8A5A5;
-            padding: 8px 20px;
-            border-radius: 20px;
-            display: inline-block;
-            margin-top: 10px;
-        }
-
-        .bingo-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin: 25px 0;
-        }
-
-        .bingo-cell {
-            aspect-ratio: 1;
-            background: linear-gradient(135deg, #FFF9F5 0%, #F5E6D3 100%);
-            border: 3px solid #E8A5A5;
-            border-radius: 15px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            user-select: none;
-            -webkit-user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .bingo-cell:active {
-            transform: scale(0.95);
-        }
-
-        .bingo-cell.free {
-            background: linear-gradient(135deg, #B8434E 0%, #E8A5A5 100%);
-            border-color: #B8434E;
-            color: white;
-            cursor: default;
-        }
-
-        .bingo-cell.free:active {
-            transform: none;
-        }
-
-        .bingo-cell.editable {
-            background: linear-gradient(135deg, #FFF 0%, #FFFAF5 100%);
-            border-style: dashed;
-            cursor: text;
-        }
-
-        .bingo-cell.editable:active {
-            transform: none;
-        }
-
-        .bingo-cell.editable.confirmed {
-            background: linear-gradient(135deg, #FFF9F5 0%, #F5E6D3 100%);
-            border-style: solid;
-            cursor: pointer;
-        }
-
-        .bingo-cell.editable.confirmed:active {
-            transform: scale(0.95);
-        }
-
-        .cell-content {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            z-index: 1;
-        }
-
-        .cell-text {
-            font-size: 13px;
-            color: #6B4C41;
-            text-align: center;
-            line-height: 1.4;
-            font-weight: 500;
-            white-space: pre-line;
-            pointer-events: none;
-        }
-
-        .bingo-cell.free .cell-text {
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
-        }
-
-        .editable-input {
-            width: 90%;
-            height: 80%;
-            border: none;
-            background: transparent;
-            text-align: center;
-            font-size: 12px;
-            color: #6B4C41;
-            font-family: inherit;
-            resize: none;
-            outline: none;
-            padding: 5px;
-            pointer-events: auto;
-        }
-
-        .editable-input::placeholder {
-            color: #B8A5A0;
-            font-size: 11px;
-        }
-
-        .stamp {
-            position: absolute;
-            font-size: 50px;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0);
-            opacity: 0;
-            pointer-events: none;
-            z-index: 3;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
-        }
-
-        .bingo-cell.checked .stamp {
-            animation: stampPop 0.5s ease-out forwards;
-        }
-
-        @keyframes stampPop {
-            0% {
-                transform: translate(-50%, -50%) scale(0) rotate(-30deg);
-                opacity: 0;
-            }
-            50% {
-                transform: translate(-50%, -50%) scale(1.2) rotate(10deg);
-                opacity: 1;
-            }
-            100% {
-                transform: translate(-50%, -50%) scale(1) rotate(0deg);
-                opacity: 1;
-            }
-        }
-
-        .progress {
-            text-align: center;
-            margin: 20px 0;
-            padding: 15px;
-            background: linear-gradient(135deg, #E8A5A5 0%, #F5C5C5 100%);
-            border-radius: 15px;
-        }
-
-        .progress-text {
-            font-size: 16px;
-            color: #6B4C41;
-            font-weight: bold;
-            margin-bottom: 8px;
-        }
-
-        .progress-count {
-            font-size: 28px;
-            color: #B8434E;
-            font-weight: bold;
-        }
-
-        .message {
-            text-align: center;
-            font-size: 14px;
-            color: #6B4C41;
-            line-height: 1.6;
-            margin-top: 15px;
-            padding: 15px;
-            background: rgba(232, 165, 165, 0.2);
-            border-radius: 15px;
-        }
-
-        .reset-btn {
-            display: block;
-            width: 100%;
-            max-width: 200px;
-            margin: 20px auto 0;
-            padding: 12px 24px;
-            background: linear-gradient(135deg, #B8434E 0%, #E8A5A5 100%);
-            color: white;
-            border: none;
-            border-radius: 25px;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(184, 67, 78, 0.3);
-            -webkit-tap-highlight-color: transparent;
-            position: relative;
-            z-index: 100;
-            pointer-events: auto;
-        }
-
-        .reset-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(184, 67, 78, 0.4);
-        }
-
-        .reset-btn:active {
-            transform: translateY(0);
-            background: linear-gradient(135deg, #A03A42 0%, #D89595 100%);
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 12px;
-            color: #B8A5A0;
-        }
-
-        /* リセット確認モーダル */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.4);
-            z-index: 2000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-box {
-            background: white;
-            border-radius: 20px;
-            padding: 30px 25px;
-            max-width: 300px;
-            width: 85%;
-            text-align: center;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-        }
-
-        .modal-title {
-            font-size: 18px;
-            font-weight: bold;
-            color: #B8434E;
-            margin-bottom: 10px;
-        }
-
-        .modal-text {
-            font-size: 14px;
-            color: #6B4C41;
-            margin-bottom: 25px;
-            line-height: 1.6;
-        }
-
-        .modal-buttons {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-        }
-
-        .modal-btn-cancel {
-            flex: 1;
-            padding: 12px;
-            border: 2px solid #E8A5A5;
-            border-radius: 20px;
-            background: white;
-            color: #B8434E;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .modal-btn-ok {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 20px;
-            background: linear-gradient(135deg, #B8434E, #E8A5A5);
-            color: white;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .celebration {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 80px;
-            z-index: 1000;
-            pointer-events: none;
-            animation: celebrate 2s ease-out forwards;
-        }
-
-        @keyframes celebrate {
-            0% {
-                transform: translate(-50%, -50%) scale(0);
-                opacity: 0;
-            }
-            30% {
-                transform: translate(-50%, -50%) scale(1.2);
-                opacity: 1;
-            }
-            70% {
-                transform: translate(-50%, -50%) scale(0.9);
-                opacity: 1;
-            }
-            100% {
-                transform: translate(-50%, -50%) scale(0);
-                opacity: 0;
-            }
-        }
-
-        .bingo-notification {
-            position: fixed;
-            top: 20%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(184, 67, 78, 0.95);
-            color: white;
-            padding: 20px 40px;
-            border-radius: 20px;
-            font-size: 24px;
-            font-weight: bold;
-            z-index: 1001;
-            pointer-events: none;
-            animation: bingoNotification 2s ease-out forwards;
-            box-shadow: 0 10px 40px rgba(184, 67, 78, 0.5);
-        }
-
-        @keyframes bingoNotification {
-            0% {
-                transform: translate(-50%, -50%) scale(0);
-                opacity: 0;
-            }
-            20% {
-                transform: translate(-50%, -50%) scale(1.1);
-                opacity: 1;
-            }
-            80% {
-                transform: translate(-50%, -50%) scale(1);
-                opacity: 1;
-            }
-            100% {
-                transform: translate(-50%, -50%) scale(0.8);
-                opacity: 0;
-            }
-        }
+        .cell.selected { background: #FCEFF0; border-color: #B8434E; color: #B8434E; font-weight: bold; }
+        .heart { display: none; position: absolute; font-size: 50px; color: #B8434E; opacity: 0.5; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; }
+        .selected .heart { display: block; }
+        .free .heart { display: block; opacity: 0.2; }
+        textarea { width: 100%; height: 100%; border: none; background: transparent; text-align: center; font-size: 10px; color: #B8434E; outline: none; resize: none; }
+        .btns { display: flex; gap: 10px; margin-bottom: 20px; }
+        button { flex: 1; padding: 12px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        .btn-r { background: #F2D5D8; color: #B8434E; }
+        .btn-s { background: #B8434E; color: #FFF; }
+        #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 99; }
+        .modal-c { background: #FFF; padding: 30px; border-radius: 20px; text-align: center; max-width: 350px; width: 90%; }
+        .celebration { position: fixed; pointer-events: none; z-index: 999; animation: fall 3s linear forwards; color: #B8434E; }
+        @keyframes fall { to { transform: translateY(100vh) rotate(360deg); opacity: 0; } }
     </style>
 </head>
 <body>
-    <!-- 背景装飾 -->
-    <div class="bg-hearts" id="bgHearts"></div>
-
     <div class="container">
         <div class="header">
-            <div class="title">
-                <span>♡</span>
-                <span>ご自愛ビンゴチェックシート</span>
-                <span>♡</span>
+            <h1 class="title">ご自愛♡ビンゴ</h1>
+            <p class="subtitle">毎日ちょこっと、自分にハナマルを</p>
+        </div>
+        <div class="stats">
+            <div><span class="stat-val" id="cnt">0</span>ハナマル</div>
+            <div><span class="stat-val" id="bgo">0</span>ビンゴ</div>
+        </div>
+        <div class="bingo-grid">
+            <div class="cell" id="c0" onclick="tgl(0)">一度、呼吸に意識を向けた<div class="heart">❤</div></div>
+            <div class="cell" id="c1" onclick="tgl(1)">ホッとする瞬間を感じた<div class="heart">❤</div></div>
+            <div class="cell" id="c2" onclick="tgl(2)">
+                <textarea id="i0" placeholder="誰の目も気にせず、&#13;&#10;やってみたいご自愛を&#13;&#10;入力してね" onclick="event.stopPropagation()"></textarea>
+                <div class="heart">❤</div>
             </div>
-            <div class="subtitle">タップしてご自愛を記録しよう！</div>
+            <div class="cell" id="c3" onclick="tgl(3)">どんな自分もOKだと思えた瞬間があった<div class="heart">❤</div></div>
+            <div class="cell free selected" id="c4">FREE<div class="heart">❤</div></div>
+            <div class="cell" id="c5" onclick="tgl(5)">何もしない時間をゆるした<div class="heart">❤</div></div>
+            <div class="cell" id="c6" onclick="tgl(6)">
+                <textarea id="i1" placeholder="今のあなたが心地いいと&#13;&#10;感じるご自愛を&#13;&#10;入力してね" onclick="event.stopPropagation()"></textarea>
+                <div class="heart">❤</div>
+            </div>
+            <div class="cell" id="c7" onclick="tgl(7)">“心地いい”を優先した<div class="heart">❤</div></div>
+            <div class="cell" id="c8" onclick="tgl(8)">外側から少し離れて、自分に戻った<div class="heart">❤</div></div>
         </div>
-
-        <div class="bingo-grid" id="bingoGrid" style="position: relative;">
-            <!-- JavaScriptで生成 -->
-        </div>
-
-        <div class="progress">
-            <div class="progress-text">今日のご自愛達成数</div>
-            <div class="progress-count"><span id="checkedCount">0</span> / 8</div>
-        </div>
-
-        <div class="message" id="message">
-            今日も自分を大切にする時間を作りましょう♡
-        </div>
-
-        <button class="reset-btn" id="resetBtn">リセットする</button>
-
-        <div class="footer">
-            ♡ 毎日少しずつ、自分を大切に ♡
+        <div class="btns">
+            <button class="btn-r" onclick="if(confirm('リセットしますか？'))location.reload()">リセット</button>
+            <button class="btn-s" onclick="shr()">今の気持ちをシェア</button>
         </div>
     </div>
-
+    <div id="modal" onclick="this.style.display='none'">
+        <div class="modal-c" onclick="event.stopPropagation()">
+            <h2 id="mT" style="color:#B8434E; margin-bottom:15px;"></h2>
+            <p id="mX" style="line-height:1.6; margin-bottom:20px;"></p>
+            <button class="btn-s" onclick="document.getElementById('modal').style.display='none'">閉じる</button>
+        </div>
+    </div>
     <script>
-        const bingoItems = [
-            { text: '朝の\nストレッチ', editable: false },
-            { text: '好きな\nお茶を飲む', editable: false },
-            { text: '', editable: true, placeholder: 'あなたの\nご自愛を\n書いてね♡' },
-            { text: 'SNSを\n見ない時間', editable: false },
-            { text: '💝\nフリー', free: true },
-            { text: '早めに\n寝る', editable: false },
-            { text: '', editable: true, placeholder: 'あなたの\nご自愛を\n書いてね♡' },
-            { text: '深呼吸\n3回', editable: false },
-            { text: '好きな\n音楽を聴く', editable: false }
-        ];
-
-        let checkedCells = new Set();
-        const editableValues = {};
-        const confirmedCells = new Set();
-        let completedLines = new Set();
-
-        function initBingo() {
-            const grid = document.getElementById('bingoGrid');
-            grid.innerHTML = '';
-
-            bingoItems.forEach((item, index) => {
-                const cell = document.createElement('div');
-                cell.className = 'bingo-cell';
-                cell.dataset.index = index;
-
-                if (item.free) {
-                    cell.classList.add('free');
-                    const content = document.createElement('div');
-                    content.className = 'cell-content';
-                    content.innerHTML = `<div class="cell-text">${item.text}</div>`;
-                    cell.appendChild(content);
-                    checkedCells.add(index);
-                } else if (item.editable) {
-                    cell.classList.add('editable');
-                    
-                    if (confirmedCells.has(index) && editableValues[index]) {
-                        // 確定済み：通常マスと同じ見た目
-                        cell.classList.add('confirmed');
-                        const content = document.createElement('div');
-                        content.className = 'cell-content';
-                        content.innerHTML = `<div class="cell-text">${editableValues[index]}</div>`;
-                        cell.appendChild(content);
-                        
-                        // 確定済みマスはクリックでチェック可能
-                        cell.addEventListener('click', () => toggleCell(cell, index));
-                    } else {
-                        // 未確定：入力モード
-                        const content = document.createElement('div');
-                        content.className = 'cell-content';
-                        
-                        const textarea = document.createElement('textarea');
-                        textarea.className = 'editable-input';
-                        textarea.placeholder = item.placeholder;
-                        textarea.value = editableValues[index] || '';
-                        
-                        textarea.addEventListener('input', (e) => {
-                            editableValues[index] = e.target.value;
-                        });
-                        
-                        // Enterキーで確定
-                        textarea.addEventListener('keydown', (e) => {
-                            if (e.key === 'Enter' && !e.shiftKey) {
-                                e.preventDefault();
-                                if (textarea.value.trim()) {
-                                    confirmedCells.add(index);
-                                    editableValues[index] = textarea.value.trim();
-                                    initBingo();
-                                }
-                            }
-                        });
-                        
-                        // テキストエリアのクリックは編集用
-                        textarea.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                        });
-                        
-                        content.appendChild(textarea);
-                        cell.appendChild(content);
-                        
-                        // セル自体のクリックでは何もしない（編集中は無効）
-                        cell.addEventListener('click', (e) => {
-                            // テキストエリア以外をクリックした場合、フォーカスを当てる
-                            if (e.target !== textarea) {
-                                textarea.focus();
-                            }
-                        });
+        var sel = [false, false, false, false, true, false, false, false, false];
+        function tgl(n) {
+            if (n === 4) return;
+            if (n === 2 || n === 6) {
+                var txt = document.getElementById('i' + (n==2?0:1)).value;
+                if (!txt && !sel[n]) { alert("まずはご自愛を入力してね"); return; }
+            }
+            sel[n] = !sel[n];
+            var cell = document.getElementById('c' + n);
+            if (sel[n]) cell.classList.add('selected');
+            else cell.classList.remove('selected');
+            var c = 0; for(var i=0; i<9; i++) if(sel[i]) c++;
+            document.getElementById('cnt').innerText = c - 1;
+            chk();
+        }
+        function chk() {
+            var b = 0;
+            var ls = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+            for(var i=0; i<ls.length; i++) {
+                var l = ls[i]; if(sel[l[0]] && sel[l[1]] && sel[l[2]]) b++;
+            }
+            var pb = parseInt(document.getElementById('bgo').innerText);
+            document.getElementById('bgo').innerText = b;
+            if (b > pb) {
+                var t = document.getElementById('mT'), x = document.getElementById('mX');
+                if (b === 8) {
+                    t.innerText = "✨ おかえり、わたし ✨";
+                    x.innerHTML = "何度揺れても、また戻ってこれる。  
+その感覚が、もうちゃんとここにある。  
+これからも、そのままで大丈夫。  
+  
+<b>あなたがあなたで在れますように☺</b>";
+                    for(var i=0; i<30; i++) {
+                        var h = document.createElement('div'); h.className = 'celebration'; h.innerHTML = '❤';
+                        h.style.left = Math.random()*100+'vw'; h.style.top = '-50px'; h.style.fontSize = (Math.random()*30+20)+'px';
+                        document.body.appendChild(h);
                     }
-                } else {
-                    const content = document.createElement('div');
-                    content.className = 'cell-content';
-                    content.innerHTML = `<div class="cell-text">${item.text}</div>`;
-                    cell.appendChild(content);
-                    
-                    cell.addEventListener('click', () => toggleCell(cell, index));
-                }
-
-                // スタンプ追加（フリーマス以外）
-                if (!item.free) {
-                    const stamp = document.createElement('div');
-                    stamp.className = 'stamp';
-                    stamp.textContent = '💗';
-                    cell.appendChild(stamp);
-                }
-
-                // チェック状態を復元
-                if (checkedCells.has(index)) {
-                    cell.classList.add('checked');
-                }
-
-                grid.appendChild(cell);
-            });
-
-            createBackgroundHearts();
-            updateProgress();
-        }
-
-        function toggleCell(cell, index) {
-            if (bingoItems[index].free) return;
-            
-            // 編集可能マスで未確定の場合はチェックできない
-            if (bingoItems[index].editable && !confirmedCells.has(index)) {
-                return;
-            }
-
-            if (checkedCells.has(index)) {
-                checkedCells.delete(index);
-                cell.classList.remove('checked');
-            } else {
-                checkedCells.add(index);
-                cell.classList.add('checked');
-            }
-
-            updateProgress();
-            checkBingo();
-        }
-
-        function updateProgress() {
-            const count = checkedCells.size - 1; // フリーマスを除く
-            document.getElementById('checkedCount').textContent = count;
-
-            const messageEl = document.getElementById('message');
-            if (count === 0) {
-                messageEl.textContent = '今日も自分を大切にする時間を作りましょう♡';
-            } else if (count <= 3) {
-                messageEl.textContent = 'いい調子です！自分を大切にできていますね♡';
-            } else if (count <= 5) {
-                messageEl.textContent = '素晴らしい！自分への愛が溢れていますね✨';
-            } else {
-                messageEl.textContent = '完璧です！今日も自分を大切にできました🌸';
+                } else if (b >= 3) { t.innerText = "✨ そのままでも、ちゃんと進んでる ✨"; x.innerHTML = "何かを変えなくても、  
+こうやって戻ってこれてることがすごい。  
+あなたのペースでいいんだよ。"; }
+                else if (b === 2) { t.innerText = "✨ 少し力、抜けてきたかも ✨"; x.innerHTML = "ちゃんと頑張ってたね。  
+ちゃんと気づけてるね。  
+そのままで、ちゃんと大丈夫だよ。"; }
+                else { t.innerText = "✨ ちゃんと戻ってきてるよ ✨"; x.innerHTML = "気づいた時点で、もう十分。  
+何も変わってなくても大丈夫。  
+今ここにいる自分でOKだよ。"; }
+                document.getElementById('modal').style.display = 'flex';
             }
         }
-
-        function checkBingo() {
-            const lines = [
-                [0, 1, 2], [3, 4, 5], [6, 7, 8], // 横
-                [0, 3, 6], [1, 4, 7], [2, 5, 8], // 縦
-                [0, 4, 8], [2, 4, 6] // 斜め
-            ];
-
-            let newBingoCount = 0;
-            const currentCompletedLines = new Set();
-
-            for (let i = 0; i < lines.length; i++) {
-                const line = lines[i];
-                if (line.every(idx => checkedCells.has(idx))) {
-                    currentCompletedLines.add(i);
-                    if (!completedLines.has(i)) {
-                        newBingoCount++;
-                    }
-                }
-            }
-
-            if (newBingoCount > 0) {
-                completedLines = currentCompletedLines;
-                celebrate(newBingoCount, currentCompletedLines.size);
-            } else {
-                completedLines = currentCompletedLines;
-            }
+        function shr() {
+            var n = document.getElementById('cnt').innerText;
+            var s = "今日は" + n + "回、自分にハナマルをあげられました。毎日ちょこっと、自分に戻る時間を。 #ご自愛ビンゴ";
+            if (navigator.share) navigator.share({title:'ご自愛ビンゴ', text:s, url:location.href});
+            else alert("結果：" + s);
         }
-
-        function celebrate(newLines, totalLines) {
-            // ビンゴ通知
-            const notification = document.createElement('div');
-            notification.className = 'bingo-notification';
-            if (totalLines === 1) {
-                notification.textContent = '🎉 ビンゴ！ 🎉';
-            } else if (totalLines === 2) {
-                notification.textContent = '✨🎉 ダブルビンゴ！ 🎉✨';
-            } else {
-                notification.textContent = '🌟✨🎉 トリプルビンゴ！ 🎉✨🌟';
-            }
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.remove();
-            }, 2000);
-
-            // お祝いエフェクト
-            const celebration = document.createElement('div');
-            celebration.className = 'celebration';
-            if (totalLines === 1) {
-                celebration.textContent = '🎉🌸';
-            } else if (totalLines === 2) {
-                celebration.textContent = '✨🎉🌸🎉✨';
-            } else {
-                celebration.textContent = '🌟✨🎉🌸🎉✨🌟';
-            }
-            document.body.appendChild(celebration);
-            
-            setTimeout(() => {
-                celebration.remove();
-            }, 2000);
-        }
-
-        function resetBingo() {
-            // モーダルを作成（confirmの代わり）
-            const overlay = document.createElement('div');
-            overlay.className = 'modal-overlay';
-            overlay.innerHTML = `
-                <div class="modal-box">
-                    <div class="modal-title">♡ リセットしますか？</div>
-                    <div class="modal-text">チェックと入力した内容が<br>すべてリセットされます</div>
-                    <div class="modal-buttons">
-                        <button class="modal-btn-cancel" id="cancelBtn">キャンセル</button>
-                        <button class="modal-btn-ok" id="okBtn">リセット</button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(overlay);
-
-            document.getElementById('cancelBtn').addEventListener('click', function() {
-                overlay.remove();
-            });
-
-            document.getElementById('okBtn').addEventListener('click', function() {
-                overlay.remove();
-                checkedCells.clear();
-                checkedCells.add(4);
-                editableValues[2] = '';
-                editableValues[6] = '';
-                confirmedCells.clear();
-                completedLines.clear();
-                initBingo();
-            });
-        }
-
-        function createBackgroundHearts() {
-            const container = document.getElementById('bgHearts');
-            container.innerHTML = '';
-            const heartCount = 8;
-            
-            for (let i = 0; i < heartCount; i++) {
-                const heart = document.createElement('div');
-                heart.className = 'bg-heart';
-                heart.textContent = '♡';
-                heart.style.left = `${Math.random() * 100}%`;
-                heart.style.top = `${Math.random() * 100}%`;
-                heart.style.animationDelay = `${Math.random() * 3}s`;
-                container.appendChild(heart);
-            }
-        }
-
-        // 初期化
-        window.addEventListener('DOMContentLoaded', function() {
-            initBingo();
-            
-            // リセットボタンのイベントリスナー（確実に追加）
-            const resetBtn = document.getElementById('resetBtn');
-            if (resetBtn) {
-                resetBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    resetBingo();
-                });
-                
-                // タッチイベントも追加（スマホ対応）
-                resetBtn.addEventListener('touchend', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    resetBingo();
-                });
-            }
-        });
-
-        // ページを閉じる前に確認
-        window.addEventListener('beforeunload', (e) => {
-            if (checkedCells.size > 1) {
-                e.preventDefault();
-                e.returnValue = '';
-            }
-        });
     </script>
 </body>
 </html>
