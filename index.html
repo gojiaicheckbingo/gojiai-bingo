@@ -1,133 +1,596 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ご自愛♡ビンゴ</title>
-    <style>
-        body { font-family: sans-serif; background: #F5E6D3; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .container { max-width: 450px; width: 100%; background: #FFF; border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .header { text-align: center; margin-bottom: 20px; }
-        .title { color: #B8434E; font-size: 24px; font-weight: bold; }
-        .subtitle { color: #8C6D67; font-size: 14px; }
-        .stats { display: flex; justify-content: space-around; background: #FDF8F5; padding: 10px; border-radius: 10px; margin-bottom: 20px; }
-        .stat-val { font-size: 20px; font-weight: bold; color: #B8434E; display: block; }
-        .bingo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
-        .cell { 
-            height: 100px; background: #FFF; border: 2px solid #F2D5D8; border-radius: 10px;
-            display: flex; align-items: center; justify-content: center; text-align: center;
-            font-size: 11px; cursor: pointer; position: relative; padding: 5px; overflow: hidden;
-        }
-        .cell.selected { background: #FCEFF0; border-color: #B8434E; color: #B8434E; font-weight: bold; }
-        .heart { display: none; position: absolute; font-size: 50px; color: #B8434E; opacity: 0.5; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; }
-        .selected .heart { display: block; }
-        .free .heart { display: block; opacity: 0.2; }
-        textarea { width: 100%; height: 100%; border: none; background: transparent; text-align: center; font-size: 10px; color: #B8434E; outline: none; resize: none; }
-        .btns { display: flex; gap: 10px; margin-bottom: 20px; }
-        button { flex: 1; padding: 12px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
-        .btn-r { background: #F2D5D8; color: #B8434E; }
-        .btn-s { background: #B8434E; color: #FFF; }
-        #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 99; }
-        .modal-c { background: #FFF; padding: 30px; border-radius: 20px; text-align: center; max-width: 350px; width: 90%; }
-        .celebration { position: fixed; pointer-events: none; z-index: 999; animation: fall 3s linear forwards; color: #B8434E; }
-        @keyframes fall { to { transform: translateY(100vh) rotate(360deg); opacity: 0; } }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ご自愛♡ビンゴ</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+      background: linear-gradient(135deg, #F5E6D3 0%, #F8EEE6 100%);
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      color: #5C4B48;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 450px;
+      background: #FFF;
+      border-radius: 24px;
+      padding: 22px;
+      box-shadow: 0 10px 30px rgba(120, 70, 70, 0.12);
+      position: relative;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 18px;
+    }
+
+    .title {
+      color: #B8434E;
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      color: #8C6D67;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .stats {
+      display: flex;
+      justify-content: space-around;
+      background: #FDF8F5;
+      padding: 12px 10px;
+      border-radius: 14px;
+      margin-bottom: 18px;
+      border: 1px solid #F3E0E2;
+    }
+
+    .stat {
+      text-align: center;
+      font-size: 13px;
+      color: #8C6D67;
+    }
+
+    .stat-val {
+      display: block;
+      font-size: 22px;
+      font-weight: 700;
+      color: #B8434E;
+      margin-bottom: 2px;
+    }
+
+    .bingo-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .cell {
+      min-height: 100px;
+      background: #FFF;
+      border: 2px solid #F2D5D8;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 11px;
+      line-height: 1.5;
+      cursor: pointer;
+      position: relative;
+      padding: 8px;
+      overflow: hidden;
+      transition: 0.2s ease;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .cell:active {
+      transform: scale(0.97);
+    }
+
+    .cell.fixed-text,
+    .cell.confirmed {
+      background: #FFF;
+    }
+
+    .cell.selected {
+      background: #FCEFF0;
+      border-color: #B8434E;
+      color: #B8434E;
+      font-weight: 700;
+    }
+
+    .cell.free {
+      background: linear-gradient(135deg, #B8434E 0%, #D9707A 100%);
+      border-color: #B8434E;
+      color: #FFF;
+      font-weight: 700;
+    }
+
+    .cell.free .heart {
+      display: block;
+      opacity: 0.22;
+      color: #FFF;
+    }
+
+    .cell.editing {
+      border-style: dashed;
+      background: #FFFDFC;
+      cursor: text;
+    }
+
+    .cell-text {
+      position: relative;
+      z-index: 2;
+      white-space: pre-line;
+    }
+
+    .heart {
+      display: none;
+      position: absolute;
+      font-size: 56px;
+      color: #B8434E;
+      opacity: 0.28;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .cell.selected .heart {
+      display: block;
+    }
+
+    textarea {
+      width: 100%;
+      height: 100%;
+      min-height: 72px;
+      border: none;
+      background: transparent;
+      text-align: center;
+      font-size: 10px;
+      line-height: 1.5;
+      color: #B8434E;
+      outline: none;
+      resize: none;
+      position: relative;
+      z-index: 2;
+      font-family: inherit;
+    }
+
+    textarea::placeholder {
+      color: #BE9398;
+    }
+
+    .hint {
+      position: absolute;
+      bottom: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 9px;
+      color: #C58B92;
+      z-index: 2;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .btns {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    button {
+      flex: 1;
+      padding: 13px 12px;
+      border: none;
+      border-radius: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 14px;
+      font-family: inherit;
+      transition: 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    .btn-r {
+      background: #F2D5D8;
+      color: #B8434E;
+    }
+
+    .btn-s {
+      background: #B8434E;
+      color: #FFF;
+    }
+
+    .message-box {
+      background: #FCEFF0;
+      border-radius: 16px;
+      padding: 15px;
+      text-align: center;
+      font-size: 14px;
+      color: #B8434E;
+      border: 1px dashed #B8434E;
+      line-height: 1.7;
+    }
+
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 20px;
+    }
+
+    .overlay.show {
+      display: flex;
+    }
+
+    .modal {
+      background: #FFF;
+      padding: 24px 20px;
+      border-radius: 20px;
+      text-align: center;
+      max-width: 360px;
+      width: 100%;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.18);
+    }
+
+    .modal h2 {
+      color: #B8434E;
+      margin-bottom: 12px;
+      font-size: 20px;
+      line-height: 1.5;
+    }
+
+    .modal p {
+      line-height: 1.8;
+      margin-bottom: 18px;
+      color: #5C4B48;
+      font-size: 14px;
+    }
+
+    .modal-btns {
+      display: flex;
+      gap: 10px;
+    }
+
+    .note {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #A78680;
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1 class="title">ご自愛♡ビンゴ</h1>
-            <p class="subtitle">毎日ちょこっと、自分にハナマルを</p>
-        </div>
-        <div class="stats">
-            <div><span class="stat-val" id="cnt">0</span>ハナマル</div>
-            <div><span class="stat-val" id="bgo">0</span>ビンゴ</div>
-        </div>
-        <div class="bingo-grid">
-            <div class="cell" id="c0" onclick="tgl(0)">一度、呼吸に意識を向けた<div class="heart">❤</div></div>
-            <div class="cell" id="c1" onclick="tgl(1)">ホッとする瞬間を感じた<div class="heart">❤</div></div>
-            <div class="cell" id="c2" onclick="tgl(2)">
-                <textarea id="i0" placeholder="誰の目も気にせず、&#13;&#10;やってみたいご自愛を&#13;&#10;入力してね" onclick="event.stopPropagation()"></textarea>
-                <div class="heart">❤</div>
-            </div>
-            <div class="cell" id="c3" onclick="tgl(3)">どんな自分もOKだと思えた瞬間があった<div class="heart">❤</div></div>
-            <div class="cell free selected" id="c4">FREE<div class="heart">❤</div></div>
-            <div class="cell" id="c5" onclick="tgl(5)">何もしない時間をゆるした<div class="heart">❤</div></div>
-            <div class="cell" id="c6" onclick="tgl(6)">
-                <textarea id="i1" placeholder="今のあなたが心地いいと&#13;&#10;感じるご自愛を&#13;&#10;入力してね" onclick="event.stopPropagation()"></textarea>
-                <div class="heart">❤</div>
-            </div>
-            <div class="cell" id="c7" onclick="tgl(7)">“心地いい”を優先した<div class="heart">❤</div></div>
-            <div class="cell" id="c8" onclick="tgl(8)">外側から少し離れて、自分に戻った<div class="heart">❤</div></div>
-        </div>
-        <div class="btns">
-            <button class="btn-r" onclick="if(confirm('リセットしますか？'))location.reload()">リセット</button>
-            <button class="btn-s" onclick="shr()">今の気持ちをシェア</button>
-        </div>
+  <div class="container">
+    <div class="header">
+      <h1 class="title">ご自愛♡ビンゴ</h1>
+      <p class="subtitle">毎日ちょこっと、自分にハナマルを</p>
     </div>
-    <div id="modal" onclick="this.style.display='none'">
-        <div class="modal-c" onclick="event.stopPropagation()">
-            <h2 id="mT" style="color:#B8434E; margin-bottom:15px;"></h2>
-            <p id="mX" style="line-height:1.6; margin-bottom:20px;"></p>
-            <button class="btn-s" onclick="document.getElementById('modal').style.display='none'">閉じる</button>
-        </div>
+
+    <div class="stats">
+      <div class="stat">
+        <span class="stat-val" id="cnt">0</span>
+        ハナマル
+      </div>
+      <div class="stat">
+        <span class="stat-val" id="bgo">0</span>
+        ビンゴ
+      </div>
     </div>
-    <script>
-        var sel = [false, false, false, false, true, false, false, false, false];
-        function tgl(n) {
-            if (n === 4) return;
-            if (n === 2 || n === 6) {
-                var txt = document.getElementById('i' + (n==2?0:1)).value;
-                if (!txt && !sel[n]) { alert("まずはご自愛を入力してね"); return; }
-            }
-            sel[n] = !sel[n];
-            var cell = document.getElementById('c' + n);
-            if (sel[n]) cell.classList.add('selected');
-            else cell.classList.remove('selected');
-            var c = 0; for(var i=0; i<9; i++) if(sel[i]) c++;
-            document.getElementById('cnt').innerText = c - 1;
-            chk();
+
+    <div class="bingo-grid" id="grid"></div>
+
+    <div class="btns">
+      <button class="btn-r" id="resetBtn">リセット</button>
+      <button class="btn-s" id="shareBtn">今の気持ちをシェア</button>
+    </div>
+
+    <div class="message-box">
+      気づいたことがあったら、そっとチェックしてみてね
+    </div>
+    <div class="note">空白マスは入力後、Enterで確定できます</div>
+  </div>
+
+  <!-- メッセージモーダル -->
+  <div id="messageModal" class="overlay">
+    <div class="modal" onclick="event.stopPropagation()">
+      <h2 id="mT"></h2>
+      <p id="mX"></p>
+      <button class="btn-s" id="closeMessageBtn">閉じる</button>
+    </div>
+  </div>
+
+  <!-- リセット確認モーダル -->
+  <div id="resetModal" class="overlay">
+    <div class="modal" onclick="event.stopPropagation()">
+      <h2>♡ リセットしますか？</h2>
+      <p>チェックと入力内容がすべてリセットされます。</p>
+      <div class="modal-btns">
+        <button class="btn-r" id="cancelResetBtn">キャンセル</button>
+        <button class="btn-s" id="confirmResetBtn">リセット</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const baseItems = [
+      { type: "fixed", text: "一度、呼吸に意識を向けた" },
+      { type: "fixed", text: "ホッとする瞬間を感じた" },
+      { type: "editable", placeholder: "誰の目も気にせず、\nやってみたいご自愛を\n入力してね" },
+
+      { type: "fixed", text: "どんな自分もOKだと思えた瞬間があった" },
+      { type: "free", text: "FREE" },
+      { type: "fixed", text: "何もしない時間をゆるした" },
+
+      { type: "editable", placeholder: "今のあなたが心地いいと\n感じるご自愛を\n入力してね" },
+      { type: "fixed", text: "“心地いい”を優先した" },
+      { type: "fixed", text: "外側から少し離れて、自分に戻った" }
+    ];
+
+    let items = [];
+    let previousBingoCount = 0;
+
+    function createInitialState() {
+      items = baseItems.map((item, index) => ({
+        ...item,
+        checked: index === 4,
+        value: "",
+        confirmed: item.type !== "editable"
+      }));
+      previousBingoCount = 0;
+    }
+
+    function renderGrid() {
+      const grid = document.getElementById("grid");
+      grid.innerHTML = "";
+
+      items.forEach((item, index) => {
+        const cell = document.createElement("div");
+        cell.className = "cell";
+
+        if (item.type === "free") {
+          cell.classList.add("free", "selected");
+          cell.innerHTML = `
+            <div class="cell-text">${item.text}</div>
+            <div class="heart">❤</div>
+          `;
+          grid.appendChild(cell);
+          return;
         }
-        function chk() {
-            var b = 0;
-            var ls = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-            for(var i=0; i<ls.length; i++) {
-                var l = ls[i]; if(sel[l[0]] && sel[l[1]] && sel[l[2]]) b++;
-            }
-            var pb = parseInt(document.getElementById('bgo').innerText);
-            document.getElementById('bgo').innerText = b;
-            if (b > pb) {
-                var t = document.getElementById('mT'), x = document.getElementById('mX');
-                if (b === 8) {
-                    t.innerText = "✨ おかえり、わたし ✨";
-                    x.innerHTML = "何度揺れても、また戻ってこれる。  
-その感覚が、もうちゃんとここにある。  
-これからも、そのままで大丈夫。  
-  
-<b>あなたがあなたで在れますように☺</b>";
-                    for(var i=0; i<30; i++) {
-                        var h = document.createElement('div'); h.className = 'celebration'; h.innerHTML = '❤';
-                        h.style.left = Math.random()*100+'vw'; h.style.top = '-50px'; h.style.fontSize = (Math.random()*30+20)+'px';
-                        document.body.appendChild(h);
-                    }
-                } else if (b >= 3) { t.innerText = "✨ そのままでも、ちゃんと進んでる ✨"; x.innerHTML = "何かを変えなくても、  
-こうやって戻ってこれてることがすごい。  
-あなたのペースでいいんだよ。"; }
-                else if (b === 2) { t.innerText = "✨ 少し力、抜けてきたかも ✨"; x.innerHTML = "ちゃんと頑張ってたね。  
-ちゃんと気づけてるね。  
-そのままで、ちゃんと大丈夫だよ。"; }
-                else { t.innerText = "✨ ちゃんと戻ってきてるよ ✨"; x.innerHTML = "気づいた時点で、もう十分。  
-何も変わってなくても大丈夫。  
-今ここにいる自分でOKだよ。"; }
-                document.getElementById('modal').style.display = 'flex';
-            }
+
+        if (item.type === "fixed") {
+          cell.classList.add("fixed-text");
+          if (item.checked) cell.classList.add("selected");
+          cell.innerHTML = `
+            <div class="cell-text">${item.text}</div>
+            <div class="heart">❤</div>
+          `;
+          cell.addEventListener("click", () => toggleCell(index));
+          grid.appendChild(cell);
+          return;
         }
-        function shr() {
-            var n = document.getElementById('cnt').innerText;
-            var s = "今日は" + n + "回、自分にハナマルをあげられました。毎日ちょこっと、自分に戻る時間を。 #ご自愛ビンゴ";
-            if (navigator.share) navigator.share({title:'ご自愛ビンゴ', text:s, url:location.href});
-            else alert("結果：" + s);
+
+        if (item.type === "editable" && item.confirmed) {
+          cell.classList.add("confirmed");
+          if (item.checked) cell.classList.add("selected");
+          cell.innerHTML = `
+            <div class="cell-text">${escapeHtml(item.value).replace(/\n/g, "<br>")}</div>
+            <div class="heart">❤</div>
+          `;
+          cell.addEventListener("click", () => toggleCell(index));
+          grid.appendChild(cell);
+          return;
         }
-    </script>
+
+        if (item.type === "editable" && !item.confirmed) {
+          cell.classList.add("editing");
+          const textarea = document.createElement("textarea");
+          textarea.placeholder = item.placeholder;
+          textarea.value = item.value || "";
+
+          textarea.addEventListener("input", (e) => {
+            items[index].value = e.target.value;
+          });
+
+          textarea.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              confirmEditable(index);
+            }
+          });
+
+          textarea.addEventListener("click", (e) => e.stopPropagation());
+
+          cell.appendChild(textarea);
+
+          const hint = document.createElement("div");
+          hint.className = "hint";
+          hint.textContent = "Enterで確定";
+          cell.appendChild(hint);
+
+          cell.addEventListener("click", () => {
+            textarea.focus();
+          });
+
+          grid.appendChild(cell);
+        }
+      });
+
+      updateStats();
+    }
+
+    function confirmEditable(index) {
+      const value = (items[index].value || "").trim();
+      if (!value) return;
+      items[index].value = value;
+      items[index].confirmed = true;
+      items[index].checked = false;
+      renderGrid();
+    }
+
+    function toggleCell(index) {
+      const item = items[index];
+      if (!item || item.type === "free") return;
+      if (item.type === "editable" && !item.confirmed) return;
+
+      item.checked = !item.checked;
+      renderGrid();
+      checkBingo();
+    }
+
+    function updateStats() {
+      const checkedCount = items.filter((item, idx) => idx !== 4 && item.checked).length;
+      const bingoCount = getBingoCount();
+
+      document.getElementById("cnt").textContent = checkedCount;
+      document.getElementById("bgo").textContent = bingoCount;
+    }
+
+    function getBingoCount() {
+      const sel = items.map(item => item.checked);
+      const lines = [
+        [0,1,2],[3,4,5],[6,7,8],
+        [0,3,6],[1,4,7],[2,5,8],
+        [0,4,8],[2,4,6]
+      ];
+
+      let b = 0;
+      lines.forEach(line => {
+        if (sel[line[0]] && sel[line[1]] && sel[line[2]]) b++;
+      });
+      return b;
+    }
+
+    function checkBingo() {
+      const b = getBingoCount();
+      document.getElementById("bgo").textContent = b;
+
+      if (b > previousBingoCount) {
+        const t = document.getElementById("mT");
+        const x = document.getElementById("mX");
+
+        if (b === 8) {
+          t.textContent = "✨ おかえり、わたし ✨";
+          x.innerHTML = `何度揺れても、また戻ってこれる。<br>
+その感覚が、もうちゃんとここにある。<br>
+これからも、そのままで大丈夫。`;
+        } else if (b >= 3) {
+          t.textContent = "✨ そのままでも、ちゃんと進んでる ✨";
+          x.innerHTML = `何かを変えなくても、<br>
+こうやって戻ってこれてることがすごい。<br>
+あなたのペースでいいんだよ。`;
+        } else if (b === 2) {
+          t.textContent = "✨ 少し力、抜けてきたかも ✨";
+          x.innerHTML = `ちゃんと頑張ってたね。<br>
+ちゃんと気づけてるね。<br>
+そのままで、ちゃんと大丈夫だよ。`;
+        } else {
+          t.textContent = "✨ ちゃんと戻ってきてるよ ✨";
+          x.innerHTML = `気づいた時点で、もう十分。<br>
+何も変わってなくても大丈夫。<br>
+今ここにいる自分でOKだよ。`;
+        }
+
+        openModal("messageModal");
+      }
+
+      previousBingoCount = b;
+    }
+
+    function resetAll() {
+      createInitialState();
+      renderGrid();
+      closeModal("resetModal");
+    }
+
+    function shareResult() {
+      const n = document.getElementById("cnt").textContent;
+      const b = document.getElementById("bgo").textContent;
+      const text = `今日は${n}回、自分にハナマルをあげられました。ビンゴは${b}個。毎日ちょこっと、自分に戻る時間を。 #ご自愛ビンゴ`;
+
+      if (navigator.share) {
+        navigator.share({
+          title: "ご自愛♡ビンゴ",
+          text: text,
+          url: location.href
+        }).catch(() => {});
+      } else if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(() => {
+          const t = document.getElementById("mT");
+          const x = document.getElementById("mX");
+          t.textContent = "コピーしました";
+          x.innerHTML = "シェア文をコピーしました。<br>好きな場所に貼り付けて使ってね。";
+          openModal("messageModal");
+        }).catch(() => {
+          fallbackShare(text);
+        });
+      } else {
+        fallbackShare(text);
+      }
+    }
+
+    function fallbackShare(text) {
+      const t = document.getElementById("mT");
+      const x = document.getElementById("mX");
+      t.textContent = "シェア用テキスト";
+      x.innerHTML = escapeHtml(text);
+      openModal("messageModal");
+    }
+
+    function openModal(id) {
+      document.getElementById(id).classList.add("show");
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove("show");
+    }
+
+    function escapeHtml(str) {
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      openModal("resetModal");
+    });
+
+    document.getElementById("shareBtn").addEventListener("click", shareResult);
+    document.getElementById("closeMessageBtn").addEventListener("click", () => closeModal("messageModal"));
+    document.getElementById("cancelResetBtn").addEventListener("click", () => closeModal("resetModal"));
+    document.getElementById("confirmResetBtn").addEventListener("click", resetAll);
+
+    document.getElementById("messageModal").addEventListener("click", () => closeModal("messageModal"));
+    document.getElementById("resetModal").addEventListener("click", () => closeModal("resetModal"));
+
+    createInitialState();
+    renderGrid();
+  </script>
 </body>
 </html>
