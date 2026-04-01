@@ -231,6 +231,23 @@
       line-height: 1.7;
     }
 
+    .note {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #A78680;
+      text-align: center;
+    }
+
+    .footer-copy {
+      margin-top: 18px;
+      padding-top: 14px;
+      border-top: 1px solid #F1E1E3;
+      text-align: center;
+      font-size: 11px;
+      line-height: 1.8;
+      color: #9A7C76;
+    }
+
     .overlay {
       display: none;
       position: fixed;
@@ -275,11 +292,104 @@
       gap: 10px;
     }
 
-    .note {
-      margin-top: 10px;
-      font-size: 12px;
-      color: #A78680;
+    /* 8ビンゴ達成演出 */
+    .complete-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(255,248,245,0.98) 0%, rgba(252,239,240,0.98) 55%, rgba(244,213,216,0.98) 100%);
+      z-index: 12000;
+      overflow: hidden;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .complete-overlay.show {
+      display: flex;
+    }
+
+    .hanamaru-layer {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .hanamaru {
+      position: absolute;
+      font-size: clamp(42px, 9vw, 100px);
+      color: rgba(184, 67, 78, 0.18);
+      animation: popFloat 2.8s ease-in-out infinite;
+      user-select: none;
+    }
+
+    .hanamaru:nth-child(1)  { top: 4%; left: 6%; animation-delay: 0s; }
+    .hanamaru:nth-child(2)  { top: 8%; left: 34%; animation-delay: 0.2s; }
+    .hanamaru:nth-child(3)  { top: 5%; right: 8%; animation-delay: 0.4s; }
+    .hanamaru:nth-child(4)  { top: 26%; left: 2%; animation-delay: 0.6s; }
+    .hanamaru:nth-child(5)  { top: 24%; right: 6%; animation-delay: 0.8s; }
+    .hanamaru:nth-child(6)  { top: 44%; left: 9%; animation-delay: 1s; }
+    .hanamaru:nth-child(7)  { top: 48%; right: 9%; animation-delay: 1.2s; }
+    .hanamaru:nth-child(8)  { bottom: 20%; left: 4%; animation-delay: 1.4s; }
+    .hanamaru:nth-child(9)  { bottom: 14%; left: 30%; animation-delay: 1.6s; }
+    .hanamaru:nth-child(10) { bottom: 16%; right: 28%; animation-delay: 1.8s; }
+    .hanamaru:nth-child(11) { bottom: 18%; right: 5%; animation-delay: 2s; }
+    .hanamaru:nth-child(12) { top: 68%; left: 42%; animation-delay: 2.2s; }
+
+    @keyframes popFloat {
+      0%, 100% { transform: scale(0.95) translateY(0); opacity: 0.15; }
+      50% { transform: scale(1.08) translateY(-8px); opacity: 0.3; }
+    }
+
+    .complete-card {
+      position: relative;
+      z-index: 2;
+      background: rgba(255,255,255,0.92);
+      border: 2px solid rgba(184,67,78,0.15);
+      border-radius: 28px;
+      padding: 28px 22px;
+      max-width: 380px;
+      width: 100%;
       text-align: center;
+      box-shadow: 0 14px 40px rgba(184,67,78,0.16);
+      backdrop-filter: blur(4px);
+    }
+
+    .complete-title {
+      color: #B8434E;
+      font-size: clamp(24px, 6vw, 34px);
+      font-weight: 800;
+      margin-bottom: 10px;
+      line-height: 1.4;
+    }
+
+    .complete-sub {
+      color: #8C6D67;
+      font-size: 14px;
+      line-height: 1.8;
+      margin-bottom: 18px;
+    }
+
+    .complete-main {
+      font-size: clamp(24px, 6vw, 36px);
+      color: #B8434E;
+      font-weight: 700;
+      line-height: 1.7;
+      margin-bottom: 18px;
+    }
+
+    .complete-mini {
+      font-size: 13px;
+      color: #A78680;
+      margin-bottom: 20px;
+      line-height: 1.7;
+    }
+
+    .complete-btn {
+      background: linear-gradient(135deg, #B8434E 0%, #D9707A 100%);
+      color: #fff;
+      width: 100%;
     }
   </style>
 </head>
@@ -311,10 +421,17 @@
     <div class="message-box">
       どんな自分も、まるごとハナマル♡
     </div>
+
     <div class="note">空白マスは入力後、Enterで確定できます</div>
+
+    <div class="footer-copy">
+      ©自分に戻るビジネス伴走者｜ゆき／lumiaaluto<br>
+      All Rights Reserved.<br>
+      本コンテンツのアイディア・文章の無断転載・複製を禁じます。
+    </div>
   </div>
 
-  <!-- メッセージモーダル -->
+  <!-- 通常メッセージモーダル -->
   <div id="messageModal" class="overlay">
     <div class="modal" onclick="event.stopPropagation()">
       <h2 id="mT"></h2>
@@ -332,6 +449,35 @@
         <button class="btn-r" id="cancelResetBtn">キャンセル</button>
         <button class="btn-s" id="confirmResetBtn">リセット</button>
       </div>
+    </div>
+  </div>
+
+  <!-- 8ビンゴ達成演出 -->
+  <div id="completeOverlay" class="complete-overlay">
+    <div class="hanamaru-layer">
+      <div class="hanamaru">💮</div>
+      <div class="hanamaru">💮</div>
+      <div class="hanamaru">💮</div>
+      <div class="hanamaru">💮</div>
+      <div class="hanamaru">💮</div>
+      <div class="hanamaru">💮</div>
+      <div class="hanamaru">💮</div>
+      <div class="hanamaru">💮</div>
+      <div class="hanamaru">💮</div>
+      <div class="hanamaru">💮</div>
+      <div class="hanamaru">💮</div>
+      <div class="hanamaru">💮</div>
+    </div>
+
+    <div class="complete-card">
+      <div class="complete-title">💮 8ビンゴ達成 💮</div>
+      <div class="complete-sub">今日ここまで自分を見つめてきたあなたへ</div>
+      <div class="complete-main">あなたがあなたで在れますように☺</div>
+      <div class="complete-mini">
+        ちゃんと戻ってきたね。<br>
+        今日のあなたに、大きなハナマルを。
+      </div>
+      <button class="complete-btn" id="closeCompleteBtn">とじる</button>
     </div>
   </div>
 
@@ -423,7 +569,6 @@
           });
 
           textarea.addEventListener("click", (e) => e.stopPropagation());
-
           cell.appendChild(textarea);
 
           const hint = document.createElement("div");
@@ -464,7 +609,6 @@
     function updateStats() {
       const checkedCount = items.filter((item, idx) => idx !== 4 && item.checked).length;
       const bingoCount = getBingoCount();
-
       document.getElementById("cnt").textContent = checkedCount;
       document.getElementById("bgo").textContent = bingoCount;
     }
@@ -493,37 +637,44 @@
         const x = document.getElementById("mX");
 
         if (b === 8) {
-          t.textContent = "✨ おかえり、わたし ✨";
-          x.innerHTML = `何度揺れても、また戻ってこれる。<br>
-その感覚が、もうちゃんとここにある。<br>
-これからも、そのままで大丈夫。`;
+          openComplete();
         } else if (b >= 3) {
           t.textContent = "✨ そのままでも、ちゃんと進んでる ✨";
           x.innerHTML = `何かを変えなくても、<br>
 こうやって戻ってこれてることがすごい。<br>
 あなたのペースでいいんだよ。`;
+          openModal("messageModal");
         } else if (b === 2) {
           t.textContent = "✨ 少し力、抜けてきたかも ✨";
           x.innerHTML = `ちゃんと頑張ってたね。<br>
 ちゃんと気づけてるね。<br>
 そのままで、ちゃんと大丈夫だよ。`;
-        } else {
+          openModal("messageModal");
+        } else if (b === 1) {
           t.textContent = "✨ ちゃんと戻ってきてるよ ✨";
           x.innerHTML = `気づいた時点で、もう十分。<br>
 何も変わってなくても大丈夫。<br>
 今ここにいる自分でOKだよ。`;
+          openModal("messageModal");
         }
-
-        openModal("messageModal");
       }
 
       previousBingoCount = b;
+    }
+
+    function openComplete() {
+      document.getElementById("completeOverlay").classList.add("show");
+    }
+
+    function closeComplete() {
+      document.getElementById("completeOverlay").classList.remove("show");
     }
 
     function resetAll() {
       createInitialState();
       renderGrid();
       closeModal("resetModal");
+      closeComplete();
     }
 
     function shareResult() {
@@ -533,7 +684,7 @@
 
       if (navigator.share) {
         navigator.share({
-          title: "ご自愛♡チェックビンゴ",
+          title: "ご自愛♡ビンゴ",
           text: text,
           url: location.href
         }).catch(() => {});
@@ -585,9 +736,13 @@
     document.getElementById("closeMessageBtn").addEventListener("click", () => closeModal("messageModal"));
     document.getElementById("cancelResetBtn").addEventListener("click", () => closeModal("resetModal"));
     document.getElementById("confirmResetBtn").addEventListener("click", resetAll);
+    document.getElementById("closeCompleteBtn").addEventListener("click", closeComplete);
 
     document.getElementById("messageModal").addEventListener("click", () => closeModal("messageModal"));
     document.getElementById("resetModal").addEventListener("click", () => closeModal("resetModal"));
+    document.getElementById("completeOverlay").addEventListener("click", (e) => {
+      if (e.target.id === "completeOverlay") closeComplete();
+    });
 
     createInitialState();
     renderGrid();
